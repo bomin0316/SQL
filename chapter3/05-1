@@ -1,0 +1,23 @@
+#테이블 생성과 case문
+
+CREATE TABLE long-chariot-348511.chapter3.mst_users(
+    user_id         string(255)
+  , register_date   string(255)
+  , register_device integer
+);
+
+INSERT INTO long-chariot-348511.chapter3.mst_users
+VALUES
+    ('U001', '2016-08-26', 1)
+  , ('U002', '2016-08-26', 2)
+  , ('U003', '2016-08-27', 3)
+;
+
+select user_id,
+  case
+    when register_device = 1 then '데스크톱'
+    when register_device = 2 then '스마트폰'
+    when register_device = 3 then '애플리케이션'
+    else ''
+  end as device_name
+from long-chariot-348511.chapter3.mst_users;

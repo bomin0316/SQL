@@ -1,0 +1,17 @@
+#문자열 연결
+
+CREATE TABLE long-chariot-348511.chapter3.mst_user_location (
+    user_id   string(255)
+  , pref_name string(255)
+  , city_name string(255)
+);
+
+INSERT INTO long-chariot-348511.chapter3.mst_user_location
+VALUES
+    ('U001', '서울특별시', '강서구')
+  , ('U002', '경기도수원시', '장안구')
+  , ('U003', '제주특별자치도', '서귀포시')
+;
+
+select user_id,concat(pref_name, city_name) as pref_city
+from long-chariot-348511.chapter3.mst_user_location;

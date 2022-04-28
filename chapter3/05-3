@@ -1,0 +1,19 @@
+#결손값을 디폴트값으로 대치
+
+CREATE TABLE long-chariot-348511.chapter3.purchase_log_with_coupon (
+    purchase_id string(255)
+  , amount      integer
+  , coupon      integer
+);
+
+INSERT INTO long-chariot-348511.chapter3.purchase_log_with_coupon
+VALUES
+    ('10001', 3280, NULL)
+  , ('10002', 4650,  500)
+  , ('10003', 3870, NULL)
+;
+
+select
+purchase_id, amount, coupon, amount - coupon AS discount_amount1,
+amount - coalesce(coupon, 0) as discount_amount2
+from long-chariot-348511.chapter3.purchase_log_with_coupon;

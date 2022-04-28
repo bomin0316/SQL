@@ -1,0 +1,40 @@
+#URL에서 요소 추출하기
+
+CREATE TABLE long-chariot-348511.chapter3.access_log (
+    stamp    string(255)
+  , referrer string
+  , url      string
+);
+
+INSERT INTO long-chariot-348511.chapter3.access_log 
+VALUES
+    ('2016-08-26 12:02:00', 'http://www.other.com/path1/index.php?k1=v1&k2=v2#Ref1', 'http://www.example.com/video/detail?id=001')
+  , ('2016-08-26 12:02:01', 'http://www.other.net/path1/index.php?k1=v1&k2=v2#Ref1', 'http://www.example.com/video#ref'          )
+  , ('2016-08-26 12:02:01', 'https://www.other.com/'                               , 'http://www.example.com/book/detail?id=002' )
+;
+
+select stamp
+, net.host(referrer) AS referrer_host
+from long-chariot-348511.chapter3.access_log;
+
+select stamp, url, 
+regexp_extract(url,'//[^/]+([^?#]+)') as path,
+regexp_extract(url, 'id=([^&*])') as id
+from long-chariot-348511.chapter3.access_log;
+
+select stamp, url, 
+split(regexp_extract(url,'//[^/]+([^?#]+)'), '/')[safe_ordinal(2)] as path1,
+split(regexp_extract(url,'//[^/]+([^?#]+)'), '/')[safe_ordinal(3)] as path2
+from long-chariot-348511.chapter3.access_log;
+
+#날짜와 타임스탬프
+select current_date() as dt, current_timestamp() as stamp;
+
+select cast('2022-04-28' as date) as dt,
+cast('2022-04-28 12:00:00' as timestamp) as stamp;
+
+select stamp, extract(year from stamp) as year,
+extract(month from stamp) as month,
+extract(day from stamp) as day,
+extract(hour from stamp) as hour
+from (select('2022-04-28 12:00:00') as stamp);

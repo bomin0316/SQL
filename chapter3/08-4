@@ -1,0 +1,91 @@
+CREATE TABLE long-chariot-348511.chapter3.product_sales (
+    category_name string(255)
+  , product_id    string(255)
+  , sales         integer
+);
+
+INSERT INTO long-chariot-348511.chapter3.product_sales
+VALUES
+    ('dvd' , 'D001', 50000)
+  , ('dvd' , 'D002', 20000)
+  , ('dvd' , 'D003', 10000)
+  , ('cd'  , 'C001', 30000)
+  , ('cd'  , 'C002', 20000)
+  , ('cd'  , 'C003', 10000)
+  , ('book', 'B001', 20000)
+  , ('book', 'B002', 15000)
+  , ('book', 'B003', 10000)
+  , ('book', 'B004',  5000)
+;
+
+with
+product_sale_ranking as (
+  select *, row_number() over(partition by category_name order by sales desc) as rank -- 카테고리별로 sales의 순위를 매김 --
+  from long-chariot-348511.chapter3.product_sales
+)
+select * from product_sale_ranking
+order by category_name; 
+
+with
+product_sale_ranking as(
+  select *, row_number() over(partition by category_name order by sales desc) as rank
+  from long-chariot-348511.chapter3.product_sales
+),
+mst_rank as(
+  select distinct rank
+  from long-chariot-348511.chapter3.product_sale_ranking
+)
+select * from mst_rank;
+
+with
+product_sale_ranking as(
+  select *, row_number() over(partition by category_name order by sales desc) as rank
+  from long-chariot-348511.chapter3.product_sales
+),mst_rank as(
+  select distinct rank
+  from long-chariot-348511.chapter3.product_sale_ranking
+)
+select m.rank,
+r1.product_id as dvd,
+r1.sales as dvd_sales,
+r2.product_id as cd,
+r2.sales as cd_sales,
+r3.product_id as book,
+r3.sales as book_sales
+from mst_rank as m
+left join long-chariot-348511.chapter3.product_sale_ranking as r1
+on m.rank = r1.rank
+and r1.category_name = 'dvd'
+left join long-chariot-348511.chapter3.product_sale_ranking as r2
+on m.rank = r2.rank
+and r2.category_name = 'cd'
+left join long-chariot-348511.chapter3.product_sale_ranking as r3
+on m.rank = r3.rank
+and r3.category_name ='book'
+order by m.rank;
+
+with
+mst_devices as(
+  select 1 as device_id, 'PC' AS device_name
+  union all select 2 as device_id, 'SP' as device_name
+  union all select 3 as device_id, '애플리케이션' AS device_name
+)
+select * from mst_devices;
+
+with mst_devices as(
+  select 1 as device_id, 'PC' AS device_name
+  union all select 2 as device_id, 'SP' as device_name
+  union all select 3 as device_id, '애플리케이션' AS device_name
+)
+select u.user_id, d.device_name
+from long-chariot-348511.chapter3.mst_users as u
+left join mst_devices as d
+on u.register_device = d.device_id
+order by user_id;
+
+with
+series as (
+  select idx from unnest(generate_array(1,5)) as idx
+)
+select * from series;
+

@@ -1,0 +1,103 @@
+CREATE TABLE long-chariot-348511.chapter3.daily_kpi (
+    dt        string(255)
+  , indicator string(255)
+  , val       integer
+);
+
+INSERT INTO long-chariot-348511.chapter3.daily_kpi
+VALUES
+    ('2017-01-01', 'impressions', 1800)
+  , ('2017-01-01', 'sessions'   ,  500)
+  , ('2017-01-01', 'users'      ,  200)
+  , ('2017-01-02', 'impressions', 2000)
+  , ('2017-01-02', 'sessions'   ,  700)
+  , ('2017-01-02', 'users'      ,  250)
+;
+
+-- 행으로 저장된 지표값을 열로 변화 --
+select dt,
+max(case when indicator = 'impressions' then val end) as impressions, -- indicator의 값이 impressions면 val을 impressions으로 저장 --
+max(case when indicator = 'sessions' then val end) as sessions,
+max(case when indicator = 'users' then val end) as users
+from long-chariot-348511.chapter3.daily_kpi
+group by dt
+order by dt;
+
+CREATE TABLE long-chariot-348511.chapter3.purchase_detail_log (
+    purchase_id integer
+  , product_id  string(255)
+  , price       integer
+);
+
+INSERT INTO long-chariot-348511.chapter3.purchase_detail_log
+VALUES
+    (100001, 'A001', 3000)
+  , (100001, 'A002', 4000)
+  , (100001, 'A003', 2000)
+  , (100002, 'D001', 5000)
+  , (100002, 'D002', 3000)
+  , (100003, 'A001', 3000)
+;
+
+select purchase_id,
+string_agg(product_id,',') as product_ids, -- product_id를 하나의 데이터로 묶고, 쉼표로 구분 --
+sum(price) as amount
+from long-chariot-348511.chapter3.purchase_detail_log
+group by purchase_id
+order by purchase_id;
+
+CREATE TABLE long-chariot-348511.chapter3.quarterly_sales (
+    year integer
+  , q1   integer
+  , q2   integer
+  , q3   integer
+  , q4   integer
+);
+
+INSERT INTO long-chariot-348511.chapter3.quarterly_sales
+VALUES
+    (2015, 82000, 83000, 78000, 83000)
+  , (2016, 85000, 85000, 80000, 81000)
+  , (2017, 92000, 81000, NULL , NULL )
+;
+
+select q.year,
+case
+  when p.idx = 1 then 'q1' -- p에서 idx가 1이면 q1으로 하여 quarter에 저장 --
+  when p.idx = 2 then 'q2'
+  when p.idx = 3 then 'q3'
+  when p.idx = 4 then 'q4'
+end as quarter,
+case
+  when p.idx = 1 then q.q1
+  when p.idx = 2 then q.q2
+  when p.idx = 3 then q.q3
+  when p.idx = 4 then q.q4
+end as sales
+from long-chariot-348511.chapter3.quarterly_sales as q
+cross join
+( select 1 as idx
+union all select 2 as idx
+union all select 3 as idx
+union all select 4 as idx) as p
+order by q.year, quarter;
+
+CREATE TABLE long-chariot-348511.chapter3.purchase_log (
+    purchase_id integer
+  , product_ids string(255)
+);
+
+INSERT INTO long-chariot-348511.chapter3.purchase_log
+VALUES
+    (100001, 'A001,A002,A003')
+  , (100002, 'D001,D002')
+  , (100003, 'A001')
+;
+
+select * from unnest(array['A001', 'A002', 'A003']) AS prodcut_id; -- unnest() : 매개 변수로 배열을 받고, 배열을 레코드로 분할해서 리턴 --
+
+select purchase_id, product_id
+from long-chariot-348511.chapter3.purchase_log as p
+cross join unnest(split(product_ids,',')) as product_id;
+
+

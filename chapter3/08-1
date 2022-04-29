@@ -1,0 +1,27 @@
+CREATE TABLE long-chariot-348511.chapter3.app1_mst_users (
+    user_id string(255)
+  , name    string(255)
+  , email   string(255)
+);
+
+INSERT INTO long-chariot-348511.chapter3.app1_mst_users
+VALUES
+    ('U001', 'Sato'  , 'sato@example.com'  )
+  , ('U002', 'Suzuki', 'suzuki@example.com')
+;
+
+CREATE TABLE long-chariot-348511.chapter3.app2_mst_users (
+    user_id string(255)
+  , name    string(255)
+  , phone   string(255)
+);
+
+INSERT INTO long-chariot-348511.chapter3.app2_mst_users
+VALUES
+    ('U001', 'Ito'   , '080-xxxx-xxxx')
+  , ('U002', 'Tanaka', '070-xxxx-xxxx')
+;
+
+select 'app1' as app_name, user_id, email from long-chariot-348511.chapter3.app1_mst_users -- app1에는 phone이 없어서 생략 --
+union all -- union all : 세로로 결합(컬럼이 완전히 일치해야 함--
+select 'app2' as app_name, user_id, Null as email from long-chariot-348511.chapter3.app2_mst_users; -- app2 테이블에는 email 칼럼이 없어서 null 값으로 디폴트 --

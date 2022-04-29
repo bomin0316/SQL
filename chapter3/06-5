@@ -1,0 +1,43 @@
+CREATE TABLE long-chariot-348511.chapter3.mst_users_with_dates (
+    user_id        string(255)
+  , register_stamp string(255)
+  , birth_date     string(255)
+);
+
+INSERT INTO long-chariot-348511.chapter3.mst_users_with_dates
+VALUES
+    ('U001', '2016-02-28 10:00:00', '2000-02-29')
+  , ('U002', '2016-02-29 10:00:00', '2000-02-29')
+  , ('U003', '2016-03-01 10:00:00', '2000-02-29')
+;
+
+select user_id, 
+timestamp(register_stamp) as register_stamp,
+timestamp_add(timestamp(register_stamp), interval 1 hour) as after_1_hour,
+timestamp_sub(timestamp(register_stamp), interval 30 minute) as before_30_minute,
+date(timestamp(register_stamp)) as register_date,
+date_add(date(timestamp(register_stamp)), interval 1 day) as after_1_day,
+date_sub(date(timestamp(register_stamp)), interval 1 month) as before_1_month
+from long-chariot-348511.chapter3.mst_users_with_dates; --오류발생--
+
+select user_id,
+current_date as today,
+date(timestamp(register_stamp)) as register_date,
+date_diff(current_date, date(timestamp(register_stamp)), day) as diff_days
+from long-chariot-348511.chapter3.mst_users_with_dates;
+
+select user_id,
+current_date as today,
+date(timestamp(register_stamp))as register_date,
+date(timestamp(birth_date)) as birth_date,
+date_diff(current_date, date(timestamp(birth_date)), year) as current_age,
+date_diff(date(timestamp(register_stamp)), date(timestamp(birth_date)), year) as register_age
+from long-chariot-348511.chapter3.mst_users_with_dates;
+
+select floor((20160228 - 20000229)/10000) as age;
+
+select user_id,
+substring(register_stamp, 1, 10) as register_date, birth_date,
+floor((cast(replace(substring(register_stamp,1, 10), '-','') as int64) - cast(replace(birth_date, '-','') as int64))/ 10000) as register_age,
+floor((cast(replace(cast(current_date as string), '-','') as int64) - cast(replace(birth_date, '-', '') as int64)) / 10000) as current_age
+from long-chariot-348511.chapter3.mst_users_with_dates;
